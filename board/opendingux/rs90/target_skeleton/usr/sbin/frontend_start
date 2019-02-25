@@ -1,0 +1,7 @@
+#!/bin/sh
+
+read
+
+if [ -x /usr/local/home/.autostart ] ; then
+	start-stop-daemon -S -c od -m -p /var/run/frontend.pid /usr/local/home/.autostart
+fi
