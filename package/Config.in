@@ -475,6 +475,7 @@ endmenu
 	source "package/nvidia-driver/Config.in"
 	source "package/nvidia-tegra23/Config.in"
 	source "package/nvme/Config.in"
+	source "package/odbootd/Config.in"
 	source "package/odroid-mali/Config.in"
 	source "package/odroid-scripts/Config.in"
 	source "package/ofono/Config.in"
