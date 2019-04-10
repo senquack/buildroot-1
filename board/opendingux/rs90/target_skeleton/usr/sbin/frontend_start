@@ -1,7 +1,10 @@
 #!/bin/sh
 
-read
+# Disable text console
+echo 0 > /sys/devices/virtual/vtconsole/vtcon1/bind
 
 if [ -x /usr/local/home/.autostart ] ; then
-	start-stop-daemon -S -c od -m -p /var/run/frontend.pid /usr/local/home/.autostart
+	exec /usr/local/home/.autostart
+else
+	exec /usr/bin/gmenu2x
 fi

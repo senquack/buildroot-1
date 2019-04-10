@@ -22,7 +22,6 @@ null::sysinit:/bin/ln -sf /proc/self/fd /dev/fd
 null::sysinit:/bin/ln -sf /proc/self/fd/0 /dev/stdin
 null::sysinit:/bin/ln -sf /proc/self/fd/1 /dev/stdout
 null::sysinit:/bin/ln -sf /proc/self/fd/2 /dev/stderr
-::sysinit:/bin/hostname -F /etc/hostname
 
 # Remount the main partition read-write in case it was read-only
 ::sysinit:/bin/mount -o remount,rw /boot
@@ -30,7 +29,7 @@ null::sysinit:/bin/ln -sf /proc/self/fd/2 /dev/stderr
 # now run any rc scripts
 ::sysinit:/etc/init.d/rcS
 
-console::respawn:/usr/sbin/frontend_start
+tty0::respawn:/usr/bin/sudo -i -u od /usr/sbin/frontend_start
 
 # Stuff to do before rebooting
 ::shutdown:/etc/init.d/rcK
