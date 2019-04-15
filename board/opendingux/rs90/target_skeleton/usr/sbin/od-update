@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ $# -ne 1 ] ; then
 	echo "Incorrect number of parameters.\nUsage:\n\tod-update <data_dir>"
 	exit 1
@@ -9,6 +11,11 @@ BOOTLD=$1/ubiboot.bin
 KERNEL=$1/uzImage.bin
 ROOTFS=$1/rootfs.squashfs
 
+if [ -r $ROOTFS ] ; then
+	echo "Updating rootfs..."
+	cp $ROOTFS /boot/update_r.bin
+fi
+
 if [ -r $BOOTLD ] ; then
 	echo "Updating bootloader..."
 	flash_erase /dev/mtd0 0 1
@@ -16,15 +23,10 @@ if [ -r $BOOTLD ] ; then
 fi
 
 if [ -r $KERNEL ] ; then
+	KERNEL_BAK_ID=`ubinfo -d 0 -N kernel_bak |head -n1 |sed "s/.*\(\d\+\) .*/\1/"`
 	echo "Updating kernel..."
-	ubiupdatevol /dev/ubi0_1 $KERNEL
+	ubiupdatevol /dev/ubi0_$KERNEL_BAK_ID $KERNEL
 	ubirename /dev/ubi0 kernel kernel_bak kernel_bak kernel
 fi
 
-if [ -r $ROOTFS ] ; then
-	echo "Updating rootfs..."
-	cp $ROOTFS /boot/update_r.bin
-fi
-
-echo "All done!"
 exit 0

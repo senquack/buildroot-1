@@ -18,6 +18,4 @@
 /etc/network/if-down.d			d	755	0	0	-	-	-	-	-
 /etc/network/if-post-down.d		d	755	0	0	-	-	-	-	-
 
-/usr/bin/od-update f 4755 0 0 - - - - -
-/usr/bin/opkrun f 755 0 0 - - - - -
-|xattr cap_sys_admin+ep
+/usr/bin/opkrun f 4755 0 0 - - - - -
