@@ -37,18 +37,6 @@ if [ $? -eq 1 ] ; then
 	exit 1
 fi
 
-UBIBOOT=/usr/share/opendingux/ubiboot-${MODEL}_${VARIANT}.bin
-
-if [ ! -f "${UBIBOOT}" ] ; then
-	DIALOGRC="/tmp/dialog_err.rc" \
-		dialog --msgbox 'ERROR!\n\nUnable to find bootloader.' 7 30
-	exit 1
-fi
-
-echo "Installing bootloader..."
-flash_erase /dev/mtd0 0 1
-nandwrite -p /dev/mtd0 ${UBIBOOT}
-
 echo "Formatting NAND..."
 ubiformat /dev/mtd1 -y
 ubiattach -m1
@@ -57,10 +45,7 @@ ubimkvol /dev/ubi0 -s 16MiB -N kernel_bak
 ubimkvol /dev/ubi0 -m -N rootfs
 ubiupdatevol /dev/ubi0_2 -t
 
-echo "Installing mininit..."
 mount -t ubifs ubi0:rootfs /boot
-mkdir -p /boot/root /boot/dev
-cp /usr/share/opendingux/mininit-syspart /boot
 
 echo "Configuring USB..."
 mkdir /sys/kernel/config/usb_gadget/c1
@@ -77,13 +62,26 @@ ln -s /sys/kernel/config/usb_gadget/c1/functions/ffs.ffs /sys/kernel/config/usb_
 mkdir /dev/ffs
 mount ffs -t functionfs /dev/ffs
 
-echo "Obtain rootfs and kernel from USB..."
+echo "Obtain data files from USB..."
 /usr/sbin/odbootd /dev/ffs /sys/kernel/config/usb_gadget/c1/UDC musb-hdrc.0.auto
+
+echo "Installing bootloader..."
+flash_erase /dev/mtd0 0 1
+nandwrite -p /dev/mtd0 /boot/ubiboot.bin
+
+echo "Installing mininit..."
+mkdir -p /boot/root /boot/dev
+chmod +x /boot/mininit-syspart
 
 echo "Flashing kernel..."
 ubiupdatevol /dev/ubi0_0 /boot/uzImage.bin
 ubiupdatevol /dev/ubi0_1 /boot/uzImage.bin
 
+# Cleanup
+rm /boot/uzImage.bin
+rm /boot/devicetree.dtb
+
 dialog --msgbox 'Installation succeded!\nThe device will reboot now.' 7 28
+
 reboot
 exit 0
